@@ -1,0 +1,16 @@
+---
+- name: Respaldo Masivo de Configuraciones Cisco
+  hosts: cisco_switches
+  gather_facts: no
+
+  tasks:
+    - name: Obtener running-config
+      cisco.ios.ios_command:
+        commands: show running-config
+      register: config_output
+
+    - name: Guardar config en la carpeta local
+      copy:
+        content: "{{ config_output.stdout[0] }}"
+        dest: "./backups/{{ inventory_hostname }}_{{ ansible_date_time.date }}.cfg"
+      delegate_to: localhost
